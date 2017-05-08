@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Map of parking meters in San Francisco, built with d3.js with leaflet.js</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+     
+</head>
+<body>
+
+<h1>Leaflet</h1>
+<div id="mapid" style="width: 800px; height: 600px"></div>
+
+	
+<script>
+
+// initialize Leaflet map, and set initial zoom and coordinatess
+var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+
+//-----------------------------------------------------------
+// NOTE: You'll need to get your own access Token from Mapbox
+//       Dev account sign up is easy and free, with some dev Tokens included
+//		 https://www.mapbox.com/help/define-access-token/
+//-----------------------------------------------------------
+// add basemap layer
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.light',
+    accessToken: 'pk.eyJ1Ijoia3Jpc3RpbmhlbnJ5IiwiYSI6ImNqMWdxMjd5aDAwM28zM2xtaGV2azYwcjYifQ.NTJiOqcnhP-_3etf4aZYmQ'
+}).addTo(mymap);
+
+
+
+</script>
+</body>
+</html>
