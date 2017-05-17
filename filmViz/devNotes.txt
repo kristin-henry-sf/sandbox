@@ -1,0 +1,89 @@
+# Exploring Data
+
+1. I usually start with tracing out the data
+
+2. Getting the 'sets'... how many 'locations' are in the data...can I group them this way? By production company? Some other grouping?
+
+
+	// this gives me a list of "Locations" in the data
+	var loc = d3.set(data, function(d){ return d["Locations"]})
+
+	// I'll still have to clean the data, fixing 'duplicate' names for same location 
+	// like "Treasure Island" and also "treasure Isl." and so on.
+	// but I'll do that later
+	// I want to get something visible as soon as possible, then I can clean and sculpt it
+
+
+3. How big are the sets?
+
+	var prod = d3.set(data, function(d){ return d["Production Company"]});
+ 	console.log(Object.keys(prod).length)  // how many unique production companies in data
+
+ 	If the production or distribution companies were smaller sets, I'd look at them more now...but I think Location is more interesting at this point.
+
+
+ 	Those are big sets, I was hoping for maybe 5-10 items...will have to think of other ways to cluster them. Maybe by top 5 locations,...?
+
+ 4. I'm going to grab the Locations set, which looks like this: 
+
+
+ 	  ﻿
+
+		$e {$Epic Roasthouse (399 Embarcadero): "Epic Roasthouse (399 Embarcadero)", $Mason & California Streets (Nob Hill): "Mason & California Streets (Nob Hill)", $Justin Herman Plaza: "Justin Herman Plaza", $200 block Market Street: "200 block Market Street", $City Hall: "City Hall"…}
+		$
+		:
+		""
+		$0-100 block Halleck Street
+		:
+		"0-100 block Halleck Street"
+		$1 Bush Street
+		:
+		"1 Bush Street"
+		$1 Market St. Landmark Building
+		:
+		"1 Market St. Landmark Building"
+		$1 Montgomery Street at Post
+		:
+		"1 Montgomery Street at Post"
+		$1 Post Street
+		:
+		"1 Post Street"
+		$2nd St & Howard
+		:
+		"2nd St & Howard"
+		$2nd St. at Townsend St.
+		:
+
+
+	My goal is to get a count of movies at each location...this should lead me to the most popular locations.
+
+
+	There are over 800 locations...manually editing the output is tedious. I need to output to console in format I can just copy and paste into an array of location names.
+
+	D3 has handy tools for working with collections...like 
+
+	d3.values(loc) // this gives me an array of the location names from my locations object.
+
+
+5. I want to group the movies by location names, and get a count of how many movies at each location.
+
+6. Then I want a subset of these groups...only locations with more than 5 movies filmed there.
+
+
+7. Ok, I've got my movies grouped into location, and I've got them in subsets. Now I can start drawing the viz.
+
+8. I'm starting with code I'd worked on for another project...so not starting from scratch. I just want to quickly see if this data will show an interesting pattern with my beehive multiples.
+
+
+9. Using Year as the value for the x-axis...we'll get a timeline
+
+	// get min/max of all data, so we can use same axess
+  	x.domain(d3.extent(data, function(d) { return d.year; }));
+
+  	console.log(x.domain()) // --> [1915, 2015]
+
+  	// this gives us the date range of our subset of movies....those that film in most popular locations.
+  	//Note: We may well have same movie in multiple locations now...because of how we sliced the data
+
+
+
