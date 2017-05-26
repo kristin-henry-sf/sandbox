@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+</style>
+<body>
+<p><b>Good Pie Charts</b></p>
+<svg id="pie1" width="300" height="300"></svg><svg id="pie2" width="300" height="300"></svg>
+<br>
+<svg id="pie3" width="300" height="300"></svg><svg id="pie4" width="300" height="300"></svg>
+
+
+<p><b>Bar Chart Less Readable for 1/4 Ratios</b></p>
+<svg id="bars1" width="600" height="30"></svg><br>
+<svg id="bars2" width="600" height="30"></svg>
+
+
+<p><b>Unreadable Pie Charts</b></p>
+<svg id="pie5" width="300" height="300"></svg><svg id="pie6" width="300" height="300"></svg>
+
+<p><b>Bar Charts: Better Readability</b></p>
+<svg id="bars3" width="600" height="100"></svg><br>
+<svg id="bars4" width="600" height="300"></svg><br>
+<svg id="bars5" width="600" height="300"></svg><br>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<script type="text/javascript">
+// setting up sizing for the charts
+var pie_svg = d3.select("#pie1"),
+  pie_width = +pie_svg.attr("width"),
+  pie_height = +pie_svg.attr("height"),
+  radius = Math.min(pie_width, pie_height) / 2;
+
+var stack_svg = d3.select("#bars1"),
+    stack_height = +stack_svg.attr("height"),
+    stack_width = +stack_svg.attr("width")
+
+var bar_svg = d3.select("#bars4"),
+    bar_width = +bar_svg.attr("width"),
+    bar_height = +bar_svg.attr("height")
+
+// Select the chart containers
+// good pies
+var svg1 = d3.select("#pie1")
+var pie1 = svg1.append("g").attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")");
+
+var svg2 = d3.select("#pie2")
+var pie2 = svg2.append("g").attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")");
+
+var svg3 = d3.select("#pie3")
+var pie3 = svg3.append("g").attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")");
+
+var svg4 = d3.select("#pie4")
+var pie4 = svg4.append("g").attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")");
+
+// bad pie charts
+var svg5 = d3.select("#pie5")
+var pie5 = svg5.append("g").attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")");
+
+var svg6 = d3.select("#pie6")
+var pie6 = svg6.append("g").attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")");
+
+
+// bar chart for 'good pies' data
+var svg7 = d3.select("#bars1")
+var bars1 = svg7.append("g")
+
+var svg8 = d3.select("#bars2")
+var bars2 = svg8.append("g")
+
+// stacked bar charts
+var svg9 = d3.select("#bars3")
+var bars3 = svg9.append("g")
+
+// grouped bar charts
+var svg10 = d3.select("#bars4")
+var bars4 = svg10.append("g")
+
+var svg11 = d3.select("#bars5")
+var bars5 = svg11.append("g")
+
+
+
+var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+var pie = d3.pie()
+    .sort(null)
+    .value(function(d) { return d.population; });
+
+var path = d3.arc()
+    .outerRadius(radius - 10)
+    .innerRadius(0);
+
+var label = d3.arc()
+    .outerRadius(radius - 40)
+    .innerRadius(radius - 40);
+
+
+// can do this outside of the csv-loader-function
+function drawGoodPies(){
+  // 25%  piechart example
+  goodPie1 = {'data': [{'age': '25%', 'population': 25}, {'age': '75%', 'population': 75}]}
+  goodPie2 = {'data': [{'age': '28%', 'population': 28}, {'age': '72%', 'population': 72}]}
+  // 50% piechart example
+  goodPie3 = {'data': [{'age': '50%', 'population': 50}, {'age': '50%', 'population': 50}]}
+  goodPie4 = {'data': [{'age': '48%', 'population': 48}, {'age': '52%', 'population': 52}]}
+
+  drawPie(pie1, goodPie1)
+  drawPie(pie2, goodPie2)
+  drawPie(pie3, goodPie3)
+  drawPie(pie4, goodPie4)
+
+  //draw good pies as stacked bars
+  goodPie1a = {'25%':25, '75%':75, 'group':'1', 'total':100}
+  keys = ['25%', '75%']
+  drawStackedBars(bars1, [goodPie1a], keys, stack_width, stack_height);
+
+  goodPie2a = {'28%':28, '72%':72, 'group':'2', 'total':100}
+  keys = ['28%', '72%']
+  drawStackedBars(bars2, [goodPie2a], keys, stack_width, stack_height);
+}
+
+drawGoodPies();
+
+
+d3.csv("data_new.csv", function(error, data){
+  if (error) throw error;
+
+  var keys = data.columns.slice(1);
+
+  // draw bad pie charts
+  var piedata = reshapeForPie(data, keys);
+
+  //draw one piechart for each 'group'
+  piedata.forEach(function(d){ 
+    if(d["group"] == 1){drawPie(pie5, d)}
+    else { drawPie(pie6, d)}
+  })
+
+  // draw the barcharts
+  var stack_data = addTotal(data, keys)
+  drawStackedBars(bars3, stack_data, keys, 600, 100)
+
+
+  var grouping = 'group';
+  drawGroupedBars(bars4, data, keys, grouping)
+
+
+  var grouping = 'age'
+  var agesData = reshapeByAges(data, keys)
+  var keys2 = ["group1", "group2"]
+  drawGroupedBars(bars5, agesData, keys2, grouping)
+
+})
+
+
+
+
+function reshapeForPie(data, keys){
+  var reshaped = []
+
+  data.forEach(function(d){ 
+      var piedata = {}
+      piedata.group = d.group
+      piedata.data = []
+
+      piedata.total = 0;
+      for(key in d){
+        if(key != "group"){
+          d[key] = +d[key]
+          piedata.total += d[key]
+          piedata.data.push({'age': key, 'population': d[key], 'group': d.group}) 
+        }
+      }
+      reshaped.push(piedata)
+  })
+  return reshaped;
+}
+
+
+function reshapeByAges(data, keys){
+  var reshaped = [];
+
+  keys.forEach(function(d){
+    var grp = {'age': d, 'group1': data[0][d], 'group2': data[1][d]}
+    reshaped.push(grp)
+  })
+  return reshaped;
+}
+
+
+function addTotal(data, keys){
+   data.forEach(function(d){
+    d.total = 0
+    keys.forEach(function(key){
+        d[key] = +d[key]
+        d.total +=  d[key]
+    })
+  })
+  return data
+}
+
+
+
+function drawGroupedBars(targ, data, keys, grouping){
+
+  var x0 = d3.scaleBand()
+    .rangeRound([0, bar_width])
+    .paddingInner(0.1);
+
+  var x1 = d3.scaleBand()
+      .padding(0.05);
+
+  var y = d3.scaleLinear()
+      .rangeRound([bar_height, 0]);
+
+  var z = color;  
+  
+  x0.domain(data.map(function(d) { return d[grouping]; }));
+  x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+  y.domain([0, d3.max(data, 
+    function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();
+
+  targ.append("g")
+    .selectAll("g")
+    .data(data)
+    .enter().append("g")
+      .attr("transform", function(d) { return "translate(" + x0(d[grouping]) + ",0)"; })
+    .selectAll("rect")
+    .data(function(d) { 
+          var map = keys.map(function(key) { return {key: key, value: +d[key]}; });
+          return  map})
+    .enter().append("rect")
+      .attr("x", function(d) { return x1(d.key); })
+
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", x1.bandwidth())
+      .attr("height", function(d) { return bar_height - y(d.value); })
+      .attr("fill", function(d) { return z(d.key); });     
+}
+
+
+
+function drawStackedBars(targ, data, keys, w, h){
+
+  var y = d3.scaleBand()
+    .rangeRound([0, h])
+    .paddingInner(0.05)
+    .align(0.1);
+
+  var x = d3.scaleLinear()
+      .rangeRound([w, 0]);
+
+  var z = color;
+  
+  y.domain(data.map(function(d){ return d.group}))
+  x.domain([0, d3.max(data, function(d){ return d.total})]).nice();
+  z.domain(keys);
+
+  targ.append("g")
+    .selectAll("g")
+    .data(d3.stack().keys(keys)(data))
+    .enter().append("g")
+      .attr("fill", function(d) { return z(d.key); })
+    .selectAll("rect")
+    .data(function(d) { return d; })
+    .enter().append("rect")
+      .attr("y", function(d) { return y(d.data.group); })
+      .attr("x", function(d) { return x(d[1]); })
+      .attr("height", 40)
+      .attr("width", function(d) { return x(d[0]) - x(d[1]);})    
+}
+
+
+function drawPie(targ, dataset){
+
+  var arc = targ.selectAll(".arc")
+    .data(pie(dataset.data))
+    .enter().append("g")
+      .attr("class", "arc");
+
+  arc.append("path")
+      .attr("d", path)
+      .attr("fill", function(d) { return color(d.data.age); });
+
+  arc.append("text")
+      .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")";})
+      .attr("dy", "0.35em")
+      .text(function(d) { return d.data.age; });
+}
+
+</script>
+</body>
+
